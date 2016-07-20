@@ -289,7 +289,7 @@ void inflow_thread()
         //ptask_set_deadline(tid, ptask_get_period(tid, MICRO), MICRO);
 		// Access the Autopilot interface and obtain the 
 		// number of read messages 
-		NMessRead = p->aut->fetch_message();
+		NMessRead = p->aut->fetch_data();
 
 		// If something has been found, then manage it:
 		if (NMessRead > 0)
@@ -570,13 +570,14 @@ void simulator_thread()
 		if (p->aut->is_hil())
 		{
             // Send Sensor Data to Board
-			ret_sens = p->aut->send_sensorData(&sensor_msg);
+			ret_sens = p->aut->send_message(&sensor_msg);
             
+            // Record Sending Time
 			ptime sendTime = ptask_gettime(MICRO);
 			fprintf(file_TSndSns,"%lu \n", sendTime);
 
             // Send GPS data to Board
-			//if ( (time_usec - old_sent_time) > 500000)
+			if ( (time_usec - old_sent_time) > 500000)
 			{
 				ret_gps = p->aut->send_message(&gps_msg);
 				old_sent_time = time_usec;
@@ -639,7 +640,7 @@ void gs_thread()
 			first = false;
 			printf("GS Thread STARTED! \n");
 		}
-		// Send data to the Ground Station
+		// Send all the pending data to the Ground Station
 		p->gs->sendMessage();
 
 		//Wait for data from the Ground Station 
@@ -650,6 +651,7 @@ void gs_thread()
 		// Send data to the Autopilot
 		p->aut->send_message(&msg_message);
         
+        // Record Sending Time
         gs_time = ptask_gettime(MICRO); 
 		fprintf(file_TGS,"%lu \n",gs_time);
         

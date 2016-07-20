@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -I. -I mavlink/include/mavlink/v2.0 -I ptask/src
+CFLAGS = -I. -I mavlink/include/mavlink/v1.0 -I ptask/src
 DBFLAG = -g
 LIBS = -lpthread -lrt -lptask
 MAIN_SOURCE = main_routing.cpp

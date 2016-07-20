@@ -88,7 +88,6 @@ int Udp_Port::receive_bytes(char* data, unsigned int len)
 
     ssize_t recsize;
 
-    //recsize = recvfrom(sock,(void* )buf,BUFFER_LENGTH, 0, (struct sockaddr *)&remAddr, &fromlen)  
     recsize = recvfrom(sock,(void* )rec_buf, len, 0, 0, 0);
 
     /*
