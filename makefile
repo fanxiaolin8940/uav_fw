@@ -16,9 +16,6 @@ all: main_routing.cpp $(OBJECTS)
 time_utils.o: time_utils.c time_utils.h
 	$(CC) -c $(DBFLAG) time_utils.c
 
-#queue.o: queue.c queue.h
-#	$(CC) -c $(DBFLAG) $(CFLAGS) queue.c
-
 serial_port.o: serial_port.cpp serial_port.h time_utils.h
 	$(CC) -c $(DBFLAG) $(LIBS) serial_port.cpp 
 
@@ -34,6 +31,12 @@ gs_interface.o: gs_interface.cpp gs_interface.h udp_port.h
 sim_interface.o: sim_interface.cpp sim_interface.h udp_port.h
 	$(CC) -c $(CFLAGS) $(DBFLAG) $(LIBS) sim_interface.cpp
 
+Gen_Code/Dynamics_grt_rtw *.o: Gen_Code/Dynamics_grt_rtw/*.c
+	$(CC) -c $(DBFLAG) $(inputs)
+
+Gen_Code/Sensors_grt_rtw *.o: *.c
+	$(CC) -c $(DBFLAG) $(inputs)
+
 
 #main_routing: main_routing.cpp autopilot_interface.cpp serial_port.cpp udp_port.cpp time_utils.cpp
 #	g++ -o main_routing -I mavlink/include/mavlink/v1.0 -I. serial_port.cpp ptime.c pmutex.c ptask.c \
@@ -43,3 +46,6 @@ sim_interface.o: sim_interface.cpp sim_interface.h udp_port.h
 
 clean:
 	 rm -rf *o *~ mavlink_control .*.swn .*.swo .*.swp
+
+clean_txt:
+	rm -rf *.txt

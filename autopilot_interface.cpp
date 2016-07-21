@@ -233,7 +233,8 @@ int Autopilot_Interface::handle_message(mavlink_message_t* message)
         default:
             break;
     } 
-
+	
+//	printf("Message ID from AUV : %d\n", message_id);
     return message_id;
 }
 

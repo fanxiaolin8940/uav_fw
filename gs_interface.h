@@ -61,7 +61,8 @@ class GS_Interface {
 
         struct pollfd fdsR[1];
         struct pollfd fdsW[1];
-
+		
+		char rbuff[512];
 
 };
 

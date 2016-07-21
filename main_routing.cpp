@@ -5,6 +5,9 @@
 
 
 #include "main_routing.h"
+#include "SYSTEM0.h"
+#include "SYSTEM0_private.h"
+
 
 int time_to_exit = 0;
 
@@ -577,7 +580,7 @@ void simulator_thread()
 			fprintf(file_TSndSns,"%lu \n", sendTime);
 
             // Send GPS data to Board
-			if ( (time_usec - old_sent_time) > 500000)
+			if ( (time_usec - old_sent_time) > 450000)
 			{
 				ret_gps = p->aut->send_message(&gps_msg);
 				old_sent_time = time_usec;

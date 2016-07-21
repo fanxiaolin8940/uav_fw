@@ -17,56 +17,66 @@
  *                     +----------------+
  */
 GS_Interface::GS_Interface():
-    udp_port((const char *)"127.0.0.1", (uint32_t)14551, (uint32_t)14550) 
+	udp_port((const char *)"127.0.0.1", (uint32_t)14551, (uint32_t)14550) 
 {
-    // Inizialize UDP
-    setReadPort(14551);
-    setWritePort(14550);
+	int i;
 
-    // Define the structure for the polling
-    fdsR[0].fd = udp_port.sock;
-    fdsR[0].events = POLLIN;
+	// Inizialize UDP
+	setReadPort(14551);
+	setWritePort(14550);
 
-    fdsW[0].fd = udp_port.sock;
-    fdsW[0].events = POLLOUT;
+	// Define the structure for the polling
+	fdsR[0].fd = udp_port.sock;
+	fdsR[0].events = POLLIN;
 
-    // Initialize Queues
-    //init_mess_queue(&sendQueue);
-    //init_mess_queue(&recQueue);
+	fdsW[0].fd = udp_port.sock;
+	fdsW[0].events = POLLOUT;
 
-    // Initialize Mutexes
-    pthread_mutex_init(&mut_sendQueue, 0);
-    pthread_mutex_init(&mut_recQueue, 0);
-    started = 1;
+	// Initialize Queues
+	//init_mess_queue(&sendQueue);
+	//init_mess_queue(&recQueue);
+
+	// Initialize Mutexes
+	pthread_mutex_init(&mut_sendQueue, 0);
+	pthread_mutex_init(&mut_recQueue, 0);
+	started = 1;
+
+	for (i = 0; i < 512; i++)
+		rbuff[i] = 0;
 }
 
 GS_Interface::GS_Interface(char *ip, uint32_t r_port, uint32_t w_port):
-    udp_port(ip, r_port, w_port)
+	udp_port(ip, r_port, w_port)
 {
-    // Initialize UDP
-    setReadPort(r_port);
-    setWritePort(w_port);
+	int i;
 
-    // Define the structure for the polling
-    fdsR[0].fd = udp_port.sock;
-    fdsR[0].events = POLLIN;
+	// Initialize UDP
+	setReadPort(r_port);
+	setWritePort(w_port);
 
-    fdsW[0].fd = udp_port.sock;
-    fdsW[0].events = POLLOUT;
+	// Define the structure for the polling
+	fdsR[0].fd = udp_port.sock;
+	fdsR[0].events = POLLIN;
 
-    // Initialize Queues
-    //init_mess_queue(&sendQueue);
-    //init_mess_queue(&recQueue);
+	fdsW[0].fd = udp_port.sock;
+	fdsW[0].events = POLLOUT;
 
-    // Initilize Mutexes
-    pthread_mutex_init(&mut_sendQueue, 0);
-    pthread_mutex_init(&mut_recQueue, 0);
-    started = 1;
+	// Initialize Queues
+	//init_mess_queue(&sendQueue);
+	//init_mess_queue(&recQueue);
+
+	// Initilize Mutexes
+	pthread_mutex_init(&mut_sendQueue, 0);
+	pthread_mutex_init(&mut_recQueue, 0);
+	started = 1;
+
+	for (i = 0; i < 512; i++)
+		rbuff[i] = 0;
 }
 
 GS_Interface::~GS_Interface()
 {
-    printf("GS Destructor\n");
+	printf("GS Destructor\n");
 }
 
 // ----------------------------------------------------------------
@@ -78,7 +88,7 @@ GS_Interface::~GS_Interface()
 //
 int GS_Interface::setReadPort(unsigned int port)
 {
-    r_port = port;
+	r_port = port;
 }
 
 //
@@ -86,7 +96,7 @@ int GS_Interface::setReadPort(unsigned int port)
 //
 int GS_Interface::setWritePort(unsigned int port)
 {
-    w_port = port;
+	w_port = port;
 }
 
 //
@@ -94,25 +104,25 @@ int GS_Interface::setWritePort(unsigned int port)
 //
 int GS_Interface::sendMessage()
 {
-    int bytes_sent;
-    mavlink_message_t sendMessage;
-    char buf[254];
-    int len;
-    
-    // Take the message from the queue
-    
-    //int ret = extract(&sendQueue, &sendMessage);
-    while (!sendQueue.empty())
-    {
-        pthread_mutex_lock(&mut_sendQueue);
-        sendMessage = sendQueue.front();
-        sendQueue.pop();
-        pthread_mutex_unlock(&mut_sendQueue);
+	int bytes_sent;
+	mavlink_message_t sendMessage;
+	char buf[254];
+	int len;
 
-        //printf("sendQueue # = %d\n", sendQueue.size());
-        bytes_sent = udp_port.send_mav_mess(&sendMessage);
-    }
-    return bytes_sent;
+	// Take the message from the queue
+
+	//int ret = extract(&sendQueue, &sendMessage);
+	while (!sendQueue.empty())
+	{
+		pthread_mutex_lock(&mut_sendQueue);
+		sendMessage = sendQueue.front();
+		sendQueue.pop();
+		pthread_mutex_unlock(&mut_sendQueue);
+
+		//printf("sendQueue # = %d\n", sendQueue.size());
+		bytes_sent = udp_port.send_mav_mess(&sendMessage);
+	}
+	return bytes_sent;
 }
 
 //
@@ -120,41 +130,44 @@ int GS_Interface::sendMessage()
 //
 int GS_Interface::receiveMessage()
 {
-    uint16_t timeout = 0;  // ms
-    int8_t read_bytes = 0;
-    mavlink_message_t recMessage;
+	int i;
+	uint16_t timeout = 0;  // ms
+	int8_t read_bytes = 0;
+	mavlink_message_t recMessage;
+	mavlink_status_t status;
 
-    int ret = poll(fdsR, 1, timeout);
 
-    if (ret < 0) 
-    { 
-        printf("GS_Interface::receiveMessage : ERROR IN READING UDP PORT\n");
-        return -1;
-    }
-    
-    if (ret == 0)
-    {
-        //printf("GS_Interface::receiveMessage : NO DATA RETURNED\n");
-        return 0;
-    }
-    else
-    {
-        // Receive data num bytes over UDP and put them at the sensors address
-        read_bytes = udp_port.receive_bytes((char *)&recMessage, 
-                                            sizeof(mavlink_message_t));
-        if ( read_bytes =! sizeof(mavlink_message_t))
-        {
-            printf("GS_Interface::receiveMessage : WRONG DATA RETURNED\n");
-            return -1;
-        }
-            // Retrieving complete, now copy the data into the variable
-        pthread_mutex_lock(&mut_recQueue);
-        recQueue.push(recMessage);
-        //printf("recQueue # = %d\n", recQueue.size());
-        //printf("Message id %d\n", recMessage.msgid);
-        pthread_mutex_unlock(&mut_recQueue);
-    }
-    return 1;
+	int ret = poll(fdsR, 1, timeout);
+
+	if (ret < 0) 
+	{ 
+		printf("GS_Interface::receiveMessage : ERROR IN READING UDP PORT\n");
+		return -1;
+	}
+
+	if (ret == 0)
+	{
+		//printf("GS_Interface::receiveMessage : NO DATA RETURNED\n");
+		return 0;
+	}
+	else
+	{
+		// Receive data num bytes over UDP and put them at the sensors address
+		read_bytes = udp_port.receive_bytes(rbuff, sizeof(mavlink_message_t));
+		for (i = 0; i < read_bytes; i++)
+		{
+			// Parse 1 byte at time
+			if (mavlink_parse_char(MAVLINK_COMM_2, rbuff[i], &recMessage, &status))
+			{
+				pthread_mutex_lock(&mut_recQueue);
+				recQueue.push(recMessage);
+				//printf("recQueue # = %d\n", recQueue.size());
+				//printf("Message id %d\n", recMessage.msgid);
+				pthread_mutex_unlock(&mut_recQueue);
+			}
+		}
+	}
+	return 1;
 }
 
 
@@ -163,10 +176,10 @@ int GS_Interface::receiveMessage()
 //
 int GS_Interface::pushMessage(mavlink_message_t* msg)
 {
-    pthread_mutex_lock(&mut_sendQueue);
-    sendQueue.push(*msg);
-    pthread_mutex_unlock(&mut_sendQueue);
-    return 1;
+	pthread_mutex_lock(&mut_sendQueue);
+	sendQueue.push(*msg);
+	pthread_mutex_unlock(&mut_sendQueue);
+	return 1;
 }
 
 
@@ -175,15 +188,15 @@ int GS_Interface::pushMessage(mavlink_message_t* msg)
 //
 int GS_Interface::getMessage(mavlink_message_t* msg)
 {
-    pthread_mutex_lock(&mut_recQueue);
-    if (!recQueue.empty())
-    {
-        *msg = recQueue.front();
-        recQueue.pop();
-    }
-    
-    //printf("recQueue # = %d\n", recQueue.size());
-    pthread_mutex_unlock(&mut_recQueue);
+	pthread_mutex_lock(&mut_recQueue);
+	if (!recQueue.empty())
+	{
+		*msg = recQueue.front();
+		recQueue.pop();
+	}
 
-    return 1;
+	//printf("recQueue # = %d\n", recQueue.size());
+	pthread_mutex_unlock(&mut_recQueue);
+
+	return 1;
 }
