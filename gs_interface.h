@@ -36,6 +36,7 @@ class GS_Interface {
 
         // Communication 
         int sendMessage();
+		int sendMessage(mavlink_message_t* message);
         int receiveMessage();
 
         int pushMessage(mavlink_message_t* message);

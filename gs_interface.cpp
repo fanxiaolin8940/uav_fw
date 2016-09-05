@@ -32,10 +32,6 @@ GS_Interface::GS_Interface():
 	fdsW[0].fd = udp_port.sock;
 	fdsW[0].events = POLLOUT;
 
-	// Initialize Queues
-	//init_mess_queue(&sendQueue);
-	//init_mess_queue(&recQueue);
-
 	// Initialize Mutexes
 	pthread_mutex_init(&mut_sendQueue, 0);
 	pthread_mutex_init(&mut_recQueue, 0);
@@ -60,10 +56,6 @@ GS_Interface::GS_Interface(char *ip, uint32_t r_port, uint32_t w_port):
 
 	fdsW[0].fd = udp_port.sock;
 	fdsW[0].events = POLLOUT;
-
-	// Initialize Queues
-	//init_mess_queue(&sendQueue);
-	//init_mess_queue(&recQueue);
 
 	// Initilize Mutexes
 	pthread_mutex_init(&mut_sendQueue, 0);
@@ -100,7 +92,8 @@ int GS_Interface::setWritePort(unsigned int port)
 }
 
 //
-// sendMessage
+// sendMessage 
+// Send message from the message queue
 //
 int GS_Interface::sendMessage()
 {
@@ -124,6 +117,20 @@ int GS_Interface::sendMessage()
 	}
 	return bytes_sent;
 }
+
+//
+// sendMessage
+// Send message directly
+//
+int GS_Interface::sendMessage(mavlink_message_t* sendMessage)
+{
+	int bytes_sent;
+
+    bytes_sent = udp_port.send_mav_mess(sendMessage);
+
+	return bytes_sent;
+}
+
 
 //
 // receiveMessage

@@ -390,8 +390,9 @@ void Autopilot_Interface::start_hil()
 
     printf("BaseMode    : %u \n", base_mode);
     printf("newBaseMode : %u \n", newBaseMode);
-    newBaseMode = 113;
-    mavlink_message_t msg;
+    //newBaseMode = 113;
+    newBaseMode = 32;
+	mavlink_message_t msg;
     mavlink_msg_set_mode_pack(system_id, 0, &msg, (uint8_t)1, newBaseMode, newCustomMode);
     //mavlink_msg_set_mode_pack(255, 0, &msg, (uint8_t)1, newBaseMode, 65536); 
     uint16_t len = mavlink_msg_to_send_buffer((uint8_t*)buf, &msg);
