@@ -2,7 +2,7 @@
 ## Makefile generated for Simulink model 'DynModel'. 
 ## 
 ## Makefile     : DynModel.mk
-## Generated on : Thu Jul 21 22:30:58 2016
+## Generated on : Mon Sep 05 23:01:01 2016
 ## MATLAB Coder version: 2.8 (R2015a)
 ## 
 ## Build Info:
@@ -33,7 +33,7 @@ MATLAB_ROOT               = C:/PROGRA~1/MATLAB/MATLAB~1/R2015a
 MATLAB_BIN                = C:/PROGRA~1/MATLAB/MATLAB~1/R2015a/bin
 MATLAB_ARCH_BIN           = C:/PROGRA~1/MATLAB/MATLAB~1/R2015a/bin/win64
 MASTER_ANCHOR_DIR         = 
-START_DIR                 = C:/Users/luigi/Documents/MATLAB/SIMULATOR_MOD
+START_DIR                 = C:/Users/luigi/Dropbox/University_Material/PHD/Drone/SIMULATOR_MOD
 ARCH                      = win64
 SOLVER                    = 
 SOLVER_OBJ                = 
@@ -170,7 +170,7 @@ INCLUDES = $(INCLUDES_BUILDINFO)
 
 DEFINES_BUILD_ARGS = -DMAT_FILE=0 -DINTEGER_CODE=0 -DMT=0 -DCLASSIC_INTERFACE=0 -DALLOCATIONFCN=0 -DONESTEPFCN=1 -DTERMFCN=1 -DMULTI_INSTANCE_CODE=0
 DEFINES_IMPLIED = -DTID01EQ=1
-DEFINES_STANDARD = -DMODEL=DynModel -DNUMST=2 -DNCSTATES=21 -DHAVESTDIO -DRT -DUSE_RTMODEL
+DEFINES_STANDARD = -DMODEL=DynModel -DNUMST=2 -DNCSTATES=13 -DHAVESTDIO -DRT -DUSE_RTMODEL
 
 DEFINES = $(DEFINES_BUILD_ARGS) $(DEFINES_IMPLIED) $(DEFINES_STANDARD)
 

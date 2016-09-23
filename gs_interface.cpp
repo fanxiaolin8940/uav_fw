@@ -92,10 +92,10 @@ int GS_Interface::setWritePort(unsigned int port)
 }
 
 //
-// sendMessage 
+// sendMessages
 // Send message from the message queue
 //
-int GS_Interface::sendMessage()
+int GS_Interface::sendMessages()
 {
 	int bytes_sent;
 	mavlink_message_t sendMessage;
@@ -103,7 +103,6 @@ int GS_Interface::sendMessage()
 	int len;
 
 	// Take the message from the queue
-
 	//int ret = extract(&sendQueue, &sendMessage);
 	while (!sendQueue.empty())
 	{
@@ -134,6 +133,7 @@ int GS_Interface::sendMessage(mavlink_message_t* sendMessage)
 
 //
 // receiveMessage
+// Wait for data on the UDP and receive one message from the GroundStation 
 //
 int GS_Interface::receiveMessage()
 {
@@ -142,7 +142,6 @@ int GS_Interface::receiveMessage()
 	int8_t read_bytes = 0;
 	mavlink_message_t recMessage;
 	mavlink_status_t status;
-
 
 	int ret = poll(fdsR, 1, timeout);
 
@@ -177,6 +176,55 @@ int GS_Interface::receiveMessage()
 	return 1;
 }
 
+//
+// receiveMessages
+// Wait for data on the UDP and receive messages until there is no more data
+//
+int GS_Interface::receiveMessages()
+{
+	int i;
+	uint16_t timeout = 0;  // ms
+	int8_t read_bytes = 0;
+	mavlink_message_t recMessage;
+	mavlink_status_t status;
+
+	int ret = poll(fdsR, 1, timeout);
+
+	if (ret < 0) 
+	{ 
+		printf("GS_Interface::receiveMessage : ERROR IN READING UDP PORT\n");
+		return -1;
+	}
+
+	if (ret == 0)
+	{
+		//printf("GS_Interface::receiveMessage : NO DATA RETURNED\n");
+		return 0;
+	}
+	else
+	{
+		while (ret > 0)
+		{
+			// Receive data num bytes over UDP and put them at the sensors address
+			read_bytes = udp_port.receive_bytes(rbuff, sizeof(mavlink_message_t));
+			for (i = 0; i < read_bytes; i++)
+			{
+				// Parse 1 byte at time
+				if (mavlink_parse_char(MAVLINK_COMM_2, rbuff[i], &recMessage, &status))
+				{
+					pthread_mutex_lock(&mut_recQueue);
+					recQueue.push(recMessage);
+					//printf("recQueue # = %d\n", recQueue.size());
+					//printf("Message id %d\n", recMessage.msgid);
+					pthread_mutex_unlock(&mut_recQueue);
+				}
+			}
+			ret = poll(fdsR, 1, timeout);
+		}
+	}
+	return 1;
+}
+
 
 //
 // pushMessage
@@ -206,4 +254,12 @@ int GS_Interface::getMessage(mavlink_message_t* msg)
 	pthread_mutex_unlock(&mut_recQueue);
 
 	return 1;
+}
+
+//
+// getDimrecQueue
+//
+int GS_Interface::getDimrecQueue()
+{
+	return recQueue.size();
 }

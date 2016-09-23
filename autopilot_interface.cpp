@@ -221,10 +221,6 @@ int Autopilot_Interface::handle_message(mavlink_message_t* message)
                         printf("HIL_CONTROLS frequency :   %lu Hz\n",hil_controls_count/10);
                         hil_controls_count = 0;
                         read_hil_controls_old = curr;
-                        printf("%1.2f | ",hil_controls.roll_ailerons); 
-                        printf("%1.2f | ",hil_controls.pitch_elevator);
-                        printf("%1.2f | ",hil_controls.yaw_rudder);
-                        printf("%1.2f | \n",hil_controls.throttle);
                     }
                 } 
             }
@@ -390,8 +386,8 @@ void Autopilot_Interface::start_hil()
 
     printf("BaseMode    : %u \n", base_mode);
     printf("newBaseMode : %u \n", newBaseMode);
-    //newBaseMode = 113;
-    newBaseMode = 32;
+    newBaseMode = 113;
+    //newBaseMode = 32;
 	mavlink_message_t msg;
     mavlink_msg_set_mode_pack(system_id, 0, &msg, (uint8_t)1, newBaseMode, newCustomMode);
     //mavlink_msg_set_mode_pack(255, 0, &msg, (uint8_t)1, newBaseMode, 65536); 

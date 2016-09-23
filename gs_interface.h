@@ -35,12 +35,15 @@ class GS_Interface {
         int setWritePort(unsigned int port);
 
         // Communication 
-        int sendMessage();
+        int sendMessages();
 		int sendMessage(mavlink_message_t* message);
         int receiveMessage();
+		int receiveMessages();
 
         int pushMessage(mavlink_message_t* message);
         int getMessage(mavlink_message_t* message);
+
+		int getDimrecQueue();
 
         int started;
 
