@@ -32,6 +32,7 @@ using namespace std;
 
 #include "sim_interface.h"
 #include "gs_interface.h"
+#include "ue_interface.h"
 #include "autopilot_interface.h"
 
 extern "C" {
@@ -55,7 +56,8 @@ FILE* file_TGS;
 // -----------------------------------------------------------------------
 int main(int argc, char **argv);
 
-void parse_commandline(int argc, char **argv, char *&gs_ip, unsigned int &gs_r_port, unsigned int &gs_w_port);
+void parse_commandline(int argc, char **argv, char *&gs_ip, 
+						unsigned int &gs_r_port, unsigned int &gs_w_port);
 
 void routing_messages(mavlink_message_t *msg, struct Interfaces* p);
 void unpack_ctr_mess(mavlink_message_t *msg, struct Interfaces* p);
@@ -65,17 +67,20 @@ void unpack_ctr_mess(mavlink_message_t *msg, struct Interfaces* p);
 void inflow_thread();
 void simulator_thread();
 void gs_thread();
+void ue_thread();
 
 // Threads Indexes
 int inflowT_id;
 int simT_id;
 int gsT_id;
+int ueT_id;
 
 // Struct with the pointes to the interfaces
 struct Interfaces 
 {
     GS_Interface* gs;
     Autopilot_Interface* aut;
+	UE_Interface* ue;
 };  
 
 
@@ -93,6 +98,8 @@ bool autopilot_connected = false;
 bool inflow_thread_active = false;
 bool simulator_thread_active = false;
 bool gs_thread_active = false;
+bool ue_thread_active = false;
+
 
 // Time variables
 ptime hil_ctr_time;
@@ -101,6 +108,7 @@ ptime hil_ctr_old_time;
 tspec sim_period;
 tspec aut_period;
 tspec gs_period;
+tspec ue_period;
 
 ptime inflow_drift_time;
 ptime inflow_end_time;

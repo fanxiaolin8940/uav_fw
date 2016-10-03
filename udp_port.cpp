@@ -1,11 +1,10 @@
 // ---------------------------------------------------------------------------
 // Includes
-//----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 #include <stdio.h>
 #include <errno.h>
 #include <time.h>
 #include <sys/time.h>
-
 
 #include "udp_port.h"
 
@@ -23,7 +22,6 @@ Udp_Port::Udp_Port(const char* ip_addr, uint16_t r_port, uint16_t w_port)
 {
     // Endpoint for communication file descriptor
     sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
 
     // Initialize local sockaddr_in structure
     memset(&locAddr, 0, sizeof(locAddr));
@@ -46,7 +44,6 @@ Udp_Port::Udp_Port(const char* ip_addr, uint16_t r_port, uint16_t w_port)
         close(sock);
         exit(EXIT_FAILURE);
     }
-
     
     // Perfoming a non blocking access
     if (fcntl(sock, F_SETFL, O_NONBLOCK | FASYNC) < 0)

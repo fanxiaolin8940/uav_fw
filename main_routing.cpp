@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	unsigned int gs_r_port = 14551;
 	unsigned int gs_w_port = 14550;
-	char* gs_ip = (char*)"127.0.0.1";
+	char* gs_ip = (char *)"127.0.0.1";
 	/*
 	 *                  +--------+
 	 * UDP (14550) ---> |   GS   | ----> (14551)  UDP
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Port for the communication with the Board
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	char* uart_name = (char*)"/dev/ttyUSB0";
+	char* uart_name = (char *)"/dev/ttyUSB0";
 	int baudrate = 921600;
 	/*
 	 *                           +---------+
@@ -44,16 +44,29 @@ int main(int argc, char *argv[])
 	 *                           +---------+
 	 */
 
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Ports for the communication with Unreal Engine
+	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	unsigned int ue_r_port = 8001;
+	unsigned int ue_w_port = 8000;
+	char* ue_ip = (char *)"10.30.3.136";
+	/*
+	 *                  +--------+
+	 * UDP (8000)  ---> |   UE   | ----> (8001)  UDP
+	 *                  +--------+
+	 */
+
+
     
     //======================================================================
     // Initialization
     //======================================================================
 	// Open Files descriptors to write inn
-	file_TFtcSns = fopen("Times_FtcSens.txt","w");
-	file_TSndSns = fopen("Times_SndSens.txt","w");
-	file_TFtcComm = fopen("Times_FtcCom.txt","w");
-	file_TSndComm = fopen("Times_SndCom.txt","w");
-	file_TGS = fopen("Times_GS.txt","w");
+	file_TFtcSns = fopen("Times_FtcSens.txt", "w");
+	file_TSndSns = fopen("Times_SndSens.txt", "w");
+	file_TFtcComm = fopen("Times_FtcCom.txt", "w");
+	file_TSndComm = fopen("Times_SndCom.txt", "w");
+	file_TGS = fopen("Times_GS.txt", "w");
 
 	UAV_base_mode = 0;
 
@@ -103,6 +116,11 @@ int main(int argc, char *argv[])
 	GS_Interface gs_interface(gs_ip, gs_r_port, gs_w_port);
 
 
+	/*
+ 	 * Instatiate the interface for the management of the 
+ 	 * Unreal Engine 
+ 	 */ 
+	UE_Interface ue_interface(ue_ip, ue_r_port, ue_w_port);
 
 
 	// --------------------------------------
@@ -122,7 +140,7 @@ int main(int argc, char *argv[])
 	struct Interfaces point_to_interfaces;
 	point_to_interfaces.gs = &gs_interface;
 	point_to_interfaces.aut = &autopilot_interface;
-
+	point_to_interfaces.ue = &ue_interface;
 
 
 	//======================================================================
@@ -132,6 +150,7 @@ int main(int argc, char *argv[])
 	aut_period = tspec_from(4, MILLI);
 	sim_period = tspec_from(4, MILLI);
 	gs_period = tspec_from(4, MILLI);
+	ue_period = tspec_from(20, MILLI);
 
 	tspec_init();
 
@@ -202,6 +221,21 @@ int main(int argc, char *argv[])
 	params_gs.arg = &point_to_interfaces;
 	gsT_id = ptask_create_param(gs_thread, &params_gs);
 	if(gsT_id == -1)
+	{
+		printf("Error creating the Ground Station thread\n");
+	}
+
+	// Change the priority of the task related to the Unreal Engine 
+	tpars params_ue = TASK_SPEC_DFL;
+	params_ue.period = ue_period;
+	params_ue.rdline = ue_period;
+	params_ue.priority = 70;
+	params_ue.act_flag = NOW;
+	params_ue.measure_flag = 0;
+	params_ue.processor = 0;
+	params_ue.arg = &point_to_interfaces;
+	ueT_id = ptask_create_param(ue_thread, &params_ue);
+	if(ueT_id == -1)
 	{
 		printf("Error creating the Ground Station thread\n");
 	}
@@ -589,7 +623,7 @@ void gs_thread()
 	gs_thread_active = true;
 
 	// Check the initialization of the necessary classes
-	while( !time_to_exit )
+	while (!time_to_exit)
 	{
         if (first)
 		{
@@ -604,7 +638,7 @@ void gs_thread()
 		
 		// Send data to the Autopilot
 		// We send data until the recQueue is empty
-		while(p->gs->getDimrecQueue() > 0)
+		while (p->gs->getDimrecQueue() > 0)
 		{
         	// Retrieve message from the Ground Station
 			p->gs->getMessage(&msg_message);
@@ -621,6 +655,58 @@ void gs_thread()
 }
 
 
+// ----------------------------------------------------------------------
+//    UNREAL ENGINE THREAD
+// ----------------------------------------------------------------------
+/*
+ * This thread sends data to the Unreal Engine for visualization purposes 
+ *
+ *
+ *    Pose of the Drone >--------------> UE 
+ *                         
+ * 
+ *
+ *
+ */
+void ue_thread()
+{
+	printf("***  Starting UE Communicator Thread  ***\n");
+
+	struct UE_SendData data;
+
+	data.X = (float)0.0;
+	data.Y = (float)0.0;
+	data.Z = (float)0.0;
+	
+	data.r = (float)DynModel_Y.RPY[0];
+	data.p = (float)DynModel_Y.RPY[1];
+ 	data.y = (float)DynModel_Y.RPY[2];
+	
+	int tid = ptask_get_index();
+	struct Interfaces* p = (struct Interfaces*)ptask_get_argument();
+		
+	int i;
+    
+    int first = 1;
+    
+	ue_thread_active = true;
+
+	// Check the initialization of the necessary classes
+	while (!time_to_exit)
+	{
+        if (first)
+		{
+			first = false;
+			printf("UE Thread STARTED! \n");
+		}
+		p->ue->setData(data);
+		// Send all the pending data to Unreal Engine
+		p->ue->sendData();
+
+        ptask_wait_for_period();
+	}
+
+}
 
 
 

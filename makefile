@@ -3,7 +3,8 @@ DBFLAG += -g
 LIBS += -lpthread -lrt -lptask -lm
 MAIN_SOURCE = main_routing.cpp
 OBJECTS = time_utils.o serial_port.o udp_port.o autopilot_interface.o \
-		gs_interface.o sim_interface.o DynModel.o DynModel_data.o
+		gs_interface.o sim_interface.o DynModel.o DynModel_data.o \
+		ue_interface.o
 
 MATLAB_ROOT := /usr/local/MATLAB/R2016a
 MATLABPATH := -I $(MATLAB_ROOT)/simulink/include -I $(MATLAB_ROOT)/extern/include
@@ -38,6 +39,9 @@ autopilot_interface.o: autopilot_interface.cpp autopilot_interface.h serial_port
 
 gs_interface.o: gs_interface.cpp gs_interface.h udp_port.h
 	$(CXX) -c $(CPPFLAGS) $(DBFLAG) $(LIBS) gs_interface.cpp
+
+ue_interface.o: ue_interface.cpp ue_interface.h udp_port.h
+	$(CXX) -c $(CPPFLAGS) $(DBFLAG) $(LIBS) ue_interface.cpp
 
 sim_interface.o: sim_interface.cpp sim_interface.h udp_port.h
 	$(CXX) -c $(CPPFLAGS) $(DBFLAG) $(LIBS) sim_interface.cpp
