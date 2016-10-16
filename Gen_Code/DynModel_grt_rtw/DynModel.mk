@@ -2,7 +2,7 @@
 ## Makefile generated for Simulink model 'DynModel'. 
 ## 
 ## Makefile     : DynModel.mk
-## Generated on : Mon Sep 05 23:01:01 2016
+## Generated on : Tue Sep 06 23:05:33 2016
 ## MATLAB Coder version: 2.8 (R2015a)
 ## 
 ## Build Info:

@@ -103,10 +103,13 @@ int UE_Interface::sendData()
 	int bytes_sent;
 
 	struct UE_SendData tempData;
+
+	// Comping the data in a temp structure
 	pthread_mutex_lock(&mut_sendData);
 	tempData = UEDataOut;
 	pthread_mutex_unlock(&mut_sendData);
 
+	// Sending the data
 	bytes_sent = udp_port.send_bytes((char* )&tempData, sizeof(struct UE_SendData));
 
 	return bytes_sent;
@@ -121,7 +124,7 @@ int UE_Interface::setData(struct UE_SendData Data)
 	pthread_mutex_lock(&mut_sendData);
 	UEDataOut = Data;
 	pthread_mutex_unlock(&mut_sendData);
-
+		
 	return 1;
 }
 

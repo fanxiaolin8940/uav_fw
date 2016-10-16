@@ -500,6 +500,7 @@ void simulator_thread()
 
 		DynModel_step();
 
+		/*
 		if (counter > 200)
 		{
 		printf("R = %3.2f\n", DynModel_Y.RPY[0] * 180.0 / 3.14);
@@ -519,6 +520,7 @@ void simulator_thread()
 		counter = 0;
 		}
 		counter++;
+		*/
         time_usec = ptask_gettime(MICRO);
 
         xacc = (float)DynModel_Y.Accelerometer[0];
@@ -567,7 +569,7 @@ void simulator_thread()
 			fprintf(file_TSndSns,"%lu \n", sendTime);
 
             // Send GPS data to Board
-			if ( (time_usec - old_sent_time) > 450000)
+			if ( (time_usec - old_sent_time) > 400000)
 			{
 				ret_gps = p->aut->send_message(&gps_msg);
 				old_sent_time = time_usec;
@@ -673,19 +675,11 @@ void ue_thread()
 	printf("***  Starting UE Communicator Thread  ***\n");
 
 	struct UE_SendData data;
-
-	data.X = (float)0.0;
-	data.Y = (float)0.0;
-	data.Z = (float)0.0;
-	
-	data.r = (float)DynModel_Y.RPY[0];
-	data.p = (float)DynModel_Y.RPY[1];
- 	data.y = (float)DynModel_Y.RPY[2];
 	
 	int tid = ptask_get_index();
 	struct Interfaces* p = (struct Interfaces*)ptask_get_argument();
 		
-	int i;
+	data.Id = 1;
     
     int first = 1;
     
@@ -699,10 +693,20 @@ void ue_thread()
 			first = false;
 			printf("UE Thread STARTED! \n");
 		}
+
+		data.X = (float)DynModel_Y.Xe[0];
+		data.Y = (float)DynModel_Y.Xe[1];
+		data.Z = (float)DynModel_Y.Xe[2];
+
+	
+		data.r = (float)DynModel_Y.RPY[0];
+		data.p = (float)DynModel_Y.RPY[1];
+ 		data.y = (float)DynModel_Y.RPY[2];
+
 		p->ue->setData(data);
 		// Send all the pending data to Unreal Engine
 		p->ue->sendData();
-
+	
         ptask_wait_for_period();
 	}
 

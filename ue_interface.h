@@ -18,6 +18,9 @@ extern "C" {
 
 struct UE_SendData
 {
+	// Drone Index
+	int Id;
+
 	// Position
 	float X;
 	float Y;
@@ -31,6 +34,9 @@ struct UE_SendData
 
 struct UE_RecData
 {
+	// Drone Index
+	int Id;
+
 	// Position
 	float X;
 	float Y;
