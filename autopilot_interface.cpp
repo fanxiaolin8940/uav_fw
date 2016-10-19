@@ -16,7 +16,7 @@
 
 #include "autopilot_interface.h"
 
-#define AUT_INTERFACE_DBG 1 
+#define AUT_INTERFACE_DBG 0 
 
 
 
@@ -63,8 +63,8 @@ Autopilot_Interface::Autopilot_Interface(char *&uart_name_, int &baudrate):
     pthread_mutex_init(&mut_heartbeat,0);
     pthread_cond_init(&cond_heartbeat,0);
 
-    f_aut_THilCtr = fopen("./T_aut_HilCtr.txt","w");
-    f_aut_TSens = fopen("./T_aut_Sens.txt","w");
+    //f_aut_THilCtr = fopen("./T_aut_HilCtr.txt","w");
+    //f_aut_TSens = fopen("./T_aut_Sens.txt","w");
 
     // Initialize the serial port giving device name and 
     // baudrate.
@@ -81,8 +81,8 @@ Autopilot_Interface::Autopilot_Interface(char *&uart_name_, int &baudrate):
 
 Autopilot_Interface::~Autopilot_Interface() 
 {
-    fclose(f_aut_THilCtr);
-    fclose(f_aut_TSens);
+    //fclose(f_aut_THilCtr);
+    //fclose(f_aut_TSens);
 
     printf("DESTRUCTOR\n");
 }
@@ -205,7 +205,7 @@ int Autopilot_Interface::handle_message(mavlink_message_t* message)
 
         case MAVLINK_MSG_ID_HIL_CONTROLS:
             {
-                fprintf(f_aut_THilCtr,"%lu \n",current_messages.time_stamps[message_id]);
+                //fprintf(f_aut_THilCtr,"%lu \n",current_messages.time_stamps[message_id]);
                 //printf("MAVLINK_MSG_ID_HIL_CONTROLS\n");
 
                 mavlink_hil_controls_t hil_controls;

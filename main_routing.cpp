@@ -62,12 +62,13 @@ int main(int argc, char *argv[])
     // Initialization
     //======================================================================
 	// Open Files descriptors to write inn
+	/*
 	file_TFtcSns = fopen("Times_FtcSens.txt", "w");
 	file_TSndSns = fopen("Times_SndSens.txt", "w");
 	file_TFtcComm = fopen("Times_FtcCom.txt", "w");
 	file_TSndComm = fopen("Times_SndCom.txt", "w");
 	file_TGS = fopen("Times_GS.txt", "w");
-
+    */
 	UAV_base_mode = 0;
 
     // Initialize the global Mutex and Condition Variable
@@ -352,6 +353,7 @@ void inflow_thread()
 				autopilot_connected)
 		{
             // Update the Input Structure 
+            /*
 			if (p->aut->is_hil() && counter > 500) 
 			{
             	printf("HIL_CTR : %1.2f | %1.2f | %1.2f | %1.2f\n", 
@@ -359,10 +361,11 @@ void inflow_thread()
 				counter = 0;
             }
 			counter++;
-
+			
 			//p->sim->sendActuatorCommand(hil_ctr, NFloatCont);
 			hil_ctr_time = ptask_gettime(MICRO);
-			fprintf(file_TSndComm,"%lu \n", hil_ctr_time);
+			//fprintf(file_TSndComm,"%lu \n", hil_ctr_time);
+			*/
 		}
 
 		/*
@@ -550,6 +553,8 @@ void simulator_thread()
         cog = (int16_t)(DynModel_Y.COG * 100);  
         satellites_visible = 8;
 
+
+		printf("Accelerometers : %3.2f | %3.2F | %3.2f\n", xacc, yacc, zacc);
         // Composition of the mavlink messages  
         //  Sensors Message 
         mavlink_msg_hil_sensor_pack(system_id, component_id, &sensor_msg, time_usec, 
@@ -566,7 +571,7 @@ void simulator_thread()
             
             // Record Sending Time
 			ptime sendTime = ptask_gettime(MICRO);
-			fprintf(file_TSndSns,"%lu \n", sendTime);
+			//fprintf(file_TSndSns,"%lu \n", sendTime);
 
             // Send GPS data to Board
 			if ( (time_usec - old_sent_time) > 400000)
@@ -649,7 +654,7 @@ void gs_thread()
         }
         // Record Sending Time
         gs_time = ptask_gettime(MICRO); 
-		fprintf(file_TGS,"%lu \n",gs_time);
+		//fprintf(file_TGS,"%lu \n",gs_time);
         
         ptask_wait_for_period();
 	}
@@ -674,12 +679,13 @@ void ue_thread()
 {
 	printf("***  Starting UE Communicator Thread  ***\n");
 
-	struct UE_SendData data;
+	struct UE_SendData dataOut;
+	struct UE_RecData dataIn;
 	
 	int tid = ptask_get_index();
 	struct Interfaces* p = (struct Interfaces*)ptask_get_argument();
 		
-	data.Id = 1;
+	dataOut.Id = 1;
     
     int first = 1;
     
@@ -694,19 +700,43 @@ void ue_thread()
 			printf("UE Thread STARTED! \n");
 		}
 
-		data.X = (float)DynModel_Y.Xe[0];
-		data.Y = (float)DynModel_Y.Xe[1];
-		data.Z = (float)DynModel_Y.Xe[2];
-
+		dataOut.X = (float)DynModel_Y.Xe[0];
+		dataOut.Y = (float)DynModel_Y.Xe[1];
+		dataOut.Z = (float)DynModel_Y.Xe[2];
 	
-		data.r = (float)DynModel_Y.RPY[0];
-		data.p = (float)DynModel_Y.RPY[1];
- 		data.y = (float)DynModel_Y.RPY[2];
+		dataOut.r = (float)DynModel_Y.RPY[0];
+		dataOut.p = (float)DynModel_Y.RPY[1];
+ 		dataOut.y = (float)DynModel_Y.RPY[2];
 
-		p->ue->setData(data);
+		p->ue->setData(dataOut);
 		// Send all the pending data to Unreal Engine
 		p->ue->sendData();
 	
+		
+		p->ue->receiveData();
+		p->ue->getData(&dataIn);
+/*
+			
+		if (dataIn.PenDepth != 0.0)	
+		{
+			printf("Nx = %1.2f | Ny = %1.2f | Nz = %1.2f\n", dataIn.Nx, dataIn.Ny, dataIn.Nz);
+			printf("Penetration = %2.2f\n\n", dataIn.PenDepth);
+			printf("Reaction = [%2.2f | %2.2f | %2.2f]", DynModel_Y.Freact[0], DynModel_Y.Freact[1], DynModel_Y.Freact[2]);
+		}
+*/
+		
+		//DynModel_U.n_collision[0] = dataIn.Nx;
+		//DynModel_U.n_collision[1] = -dataIn.Ny;
+		//DynModel_U.n_collision[2] = -dataIn.Nz;
+		//DynModel_U.pen_collision = dataIn.PenDepth;	
+
+		
+/*
+		DynModel_U.n_collision[0] = 0.0;
+		DynModel_U.n_collision[1] = 0.0;	
+		DynModel_U.n_collision[2] = 0.0;
+		DynModel_U.pen_collision = 0.0;
+*/
         ptask_wait_for_period();
 	}
 
@@ -823,6 +853,7 @@ quit_handler( int sig )
 		   */ 
 
 
+		/*
 		printf("Closing Files...\n\n");
 
 		printf("close(file_TSndSns\n");
@@ -836,7 +867,7 @@ quit_handler( int sig )
 
 		printf("file_TGS\n");
 		fclose(file_TGS);
-
+		*/
 	} 
 	catch (int error){}
 

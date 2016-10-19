@@ -49,6 +49,7 @@ UE_Interface::UE_Interface(char *ip, uint32_t r_port, uint32_t w_port):
 {
 	int i;
 
+	printf("UE_Interface: Read Port = %d | Write Port = %d\n", r_port, w_port);
 	// Initialize UDP
 	setReadPort(r_port);
 	setWritePort(w_port);
@@ -130,8 +131,8 @@ int UE_Interface::setData(struct UE_SendData Data)
 
 
 //
-// receiveMessage
-// Wait for data on the UDP and receive one message from the GroundStation 
+// receiveData
+// Wait for data on the UDP and receive one message from the Unreal Engine 
 //
 int UE_Interface::receiveData()
 {
@@ -143,19 +144,26 @@ int UE_Interface::receiveData()
 
 	if (ret < 0) 
 	{ 
-		printf("UE_Interface::receiveMessage : ERROR IN READING UDP PORT\n");
+		printf("UE_Interface::receiveData : ERROR IN READING UDP PORT\n");
 		return -1;
 	}
 
 	if (ret == 0)
 	{
-		//printf("UE_Interface::receiveMessage : NO DATA RETURNED\n");
+		//printf("UE_Interface::receiveData : NO DATA RETURNED\n");
 		return 0;
 	}
 	else
 	{
 		// Receive data num bytes over UDP and put them at the sensors address
 		read_bytes = udp_port.receive_bytes(rbuff, sizeof(struct UE_RecData));
+		//printf("Got Data, %d Bytes\n", read_bytes);
+		if (read_bytes == sizeof(UE_RecData))
+		{
+			memcpy((void*) &UEDataIn, (void* ) &rbuff[0], read_bytes);
+			
+		//	printf("Nx = %1.2f, Ny = %1.2f, Nz = %1.2f, Pen = %3.2f\n", UEDataIn.Nx, UEDataIn.Ny, UEDataIn.Nz, UEDataIn.PenDepth);
+		}
 	}
 	return 1;
 }
@@ -166,8 +174,7 @@ int UE_Interface::receiveData()
 int UE_Interface::getData(struct UE_RecData* data)
 {
 	pthread_mutex_lock(&mut_recData);
-
-	//printf("recQueue # = %d\n", recQueue.size());
+	memcpy((void*) data, (void*) &UEDataIn, sizeof(UE_RecData));
 	pthread_mutex_unlock(&mut_recData);
 
 	return 1;

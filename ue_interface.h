@@ -37,15 +37,13 @@ struct UE_RecData
 	// Drone Index
 	int Id;
 
-	// Position
-	float X;
-	float Y;
-	float Z;
+	// Impact Normal 
+	float Nx;
+	float Ny;
+	float Nz;
 
-	// Orientation
-	float r;
-	float p;
-	float y;
+	// Penetration 
+	float PenDepth;
 };
 
 
