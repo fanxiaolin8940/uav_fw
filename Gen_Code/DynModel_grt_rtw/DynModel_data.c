@@ -3,9 +3,9 @@
  *
  * Code generation for model "DynModel".
  *
- * Model version              : 1.411
+ * Model version              : 1.676
  * Simulink Coder version : 8.8 (R2015a) 09-Feb-2015
- * C source code generated on : Wed Oct 12 08:49:20 2016
+ * C source code generated on : Thu Oct 20 20:45:09 2016
  *
  * Target selection: grt.tlc
  * Note: GRT includes extra infrastructure and instrumentation for prototyping
@@ -21,8 +21,8 @@
 
 /* Invariant block signals (auto storage) */
 const ConstB_DynModel_T DynModel_ConstB = {
-  10.423324
-  ,                                    /* '<S124>/Switch' */
+  10.3192456
+  ,                                    /* '<S125>/Switch' */
   1.0
   ,                                    /* '<S19>/q0' */
   0.0
@@ -31,13 +31,13 @@ const ConstB_DynModel_T DynModel_ConstB = {
   ,                                    /* '<S19>/q2' */
   0.0
   ,                                    /* '<S19>/q3' */
-  10.423324
-  ,                                    /* '<S105>/Switch' */
+  10.3192456
+  ,                                    /* '<S106>/Switch' */
 
-  { 0.0409, 0.0, 0.0, 0.0, 0.0409, 0.0, 0.0, 0.0, 0.0809 }
+  { 0.0409, 0.0, 0.0, 0.0, 0.0409, 0.0, 0.0, 0.0, 0.0509 }
   ,                                    /* '<S11>/Selector' */
 
-  { 0.0409, 0.0, 0.0, 0.0, 0.0409, 0.0, 0.0, 0.0, 0.0809 }
+  { 0.0409, 0.0, 0.0, 0.0, 0.0409, 0.0, 0.0, 0.0, 0.0509 }
   /* '<S11>/Selector2' */
 };
 
@@ -45,8 +45,8 @@ const ConstB_DynModel_T DynModel_ConstB = {
 const ConstP_DynModel_T DynModel_ConstP = {
   /* Pooled Parameter (Mixed Expressions)
    * Referenced by:
-   *   '<S134>/Scale factors & Cross-coupling  errors'
-   *   '<S135>/Scale factors & Cross-coupling  errors '
+   *   '<S135>/Scale factors & Cross-coupling  errors'
+   *   '<S136>/Scale factors & Cross-coupling  errors '
    */
   { 0.98, 0.0, 0.0, 0.0, 0.98, 0.0, 0.0, 0.0, 0.98 }
 };

@@ -2,7 +2,7 @@
 ## Makefile generated for Simulink model 'DynModel'. 
 ## 
 ## Makefile     : DynModel.mk
-## Generated on : Tue Sep 06 23:05:33 2016
+## Generated on : Thu Oct 20 10:08:59 2016
 ## MATLAB Coder version: 2.8 (R2015a)
 ## 
 ## Build Info:
@@ -33,7 +33,7 @@ MATLAB_ROOT               = C:/PROGRA~1/MATLAB/MATLAB~1/R2015a
 MATLAB_BIN                = C:/PROGRA~1/MATLAB/MATLAB~1/R2015a/bin
 MATLAB_ARCH_BIN           = C:/PROGRA~1/MATLAB/MATLAB~1/R2015a/bin/win64
 MASTER_ANCHOR_DIR         = 
-START_DIR                 = C:/Users/luigi/Dropbox/University_Material/PHD/Drone/SIMULATOR_MOD
+START_DIR                 = C:/Users/luigi/Dropbox/University_Material/PHD/Drone/SIMULATOR_GEN
 ARCH                      = win64
 SOLVER                    = 
 SOLVER_OBJ                = 
@@ -160,7 +160,7 @@ BUILD_TYPE = "Top-Level Standalone Executable"
 ## INCLUDE PATHS
 ###########################################################################
 
-INCLUDES_BUILDINFO = -I$(START_DIR)/DynModel_grt_rtw -I$(START_DIR) -I$(MATLAB_ROOT)/extern/include -I$(MATLAB_ROOT)/simulink/include -I$(MATLAB_ROOT)/rtw/c/src -I$(MATLAB_ROOT)/rtw/c/src/ext_mode/common
+INCLUDES_BUILDINFO = -I$(START_DIR)/DynModel_grt_rtw -I$(START_DIR) -I$(MATLAB_ROOT)/extern/include -I$(MATLAB_ROOT)/simulink/include -I$(MATLAB_ROOT)/rtw/c/src -I$(MATLAB_ROOT)/rtw/c/src/ext_mode/common -I$(MATLAB_ROOT)/toolbox/dsp/include -I$(MATLAB_ROOT)/toolbox/dsp/extern/src/export/include/src -I$(MATLAB_ROOT)/toolbox/dsp/extern/src/export/include -I$(MATLAB_ROOT)/toolbox/shared/dsp/vision/matlab/include
 
 INCLUDES = $(INCLUDES_BUILDINFO)
 
